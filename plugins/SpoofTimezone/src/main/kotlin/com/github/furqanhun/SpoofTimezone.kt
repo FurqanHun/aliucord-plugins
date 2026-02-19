@@ -31,7 +31,7 @@ class SpoofTimezone : Plugin() {
         val originalTimeZone: TimeZone = TimeZone.getDefault()
 
         fun applyTimezone(spoofedId: String?) {
-            if (spoofedId.isNullOrBlank()) {
+            if (spoofedId == null || spoofedId.length == 0) {
                 TimeZone.setDefault(originalTimeZone)
             } else {
                 TimeZone.setDefault(TimeZone.getTimeZone(spoofedId))
@@ -48,21 +48,20 @@ class SpoofTimezone : Plugin() {
 
             setActionBarTitle("Spoof Timezone")
 
-            // Just a dumb text box now. No live-updating crash garbage.
             val input = TextInput(view.context).apply {
                 editText.hint = "Enter Timezone ID (e.g. America/New_York)"
                 editText.setText(settings.getString("spoof_timezone_id", ""))
             }
 
-            // The magic button you asked for
             val applyButton = com.aliucord.views.Button(view.context).apply {
                 text = "Apply Timezone"
                 setOnClickListener {
+                    // Safe native string conversion and trim
                     val id = input.editText.text.toString().trim()
                     settings.setString("spoof_timezone_id", id)
 
-                    applyTimezone(id) // Hijack it once on command
-                    Utils.showToast(view.context, "Applied! Force restart Discord if UI bugs out.")
+                    applyTimezone(id)
+                    Utils.showToast(view.context, "Applied! Force restart Discord to sync UI.")
                 }
             }
 
