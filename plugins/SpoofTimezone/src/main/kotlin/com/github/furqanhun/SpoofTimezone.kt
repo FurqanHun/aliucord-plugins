@@ -10,7 +10,6 @@ import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
 import com.aliucord.fragments.SettingsPage
 import com.aliucord.views.TextInput
-import com.aliucord.patcher.*
 import java.util.TimeZone
 
 @AliucordPlugin(requiresRestart = true)
@@ -23,37 +22,30 @@ class SpoofTimezone : Plugin() {
         settingsTab = SettingsTab(
             SpoofTimezoneSettings::class.java,
             SettingsTab.Type.PAGE
-        ).withArgs(settings)
+        ).withArgs(settings, originalTimeZone)
 
-        try {
-            patcher.patch(
-                TimeZone::class.java.getDeclaredMethod("getDefault"),
-                Hook { callFrame ->
-                    val spoofedId = settings.getString("spoof_timezone_id", null)
-
-                    callFrame.result = if (spoofedId.isNullOrBlank()) {
-                        originalTimeZone
-                    } else {
-                        val tz = TimeZone.getTimeZone(spoofedId)
-                        logger.info("Returning spoofed timezone: ${tz.id}")
-                        tz
-                    }
-                }
-            )
-
-            val currentSetting = settings.getString("spoof_timezone_id", "not set")
-            Utils.showToast("SpoofTimezone loaded! Current: $currentSetting")
-        } catch (e: Exception) {
-            logger.error("Failed to patch TimeZone.getDefault()", e)
-            Utils.showToast("Failed to patch timezone: ${e.message}")
-        }
+        // forcefully hijack the jvm process timezone on startup
+        applyTimezone(settings.getString("spoof_timezone_id", null), originalTimeZone)
     }
 
     override fun stop(context: Context) {
-        patcher.unpatchAll()
+        TimeZone.setDefault(originalTimeZone)
     }
 
-    class SpoofTimezoneSettings(private val settings: SettingsAPI) : SettingsPage() {
+    companion object {
+        fun applyTimezone(spoofedId: String?, original: TimeZone) {
+            if (spoofedId.isNullOrBlank()) {
+                TimeZone.setDefault(original)
+            } else {
+                TimeZone.setDefault(TimeZone.getTimeZone(spoofedId))
+            }
+        }
+    }
+
+    class SpoofTimezoneSettings(
+        private val settings: SettingsAPI,
+        private val originalTimeZone: TimeZone
+    ) : SettingsPage() {
 
         override fun onViewBound(view: View) {
             super.onViewBound(view)
@@ -62,7 +54,6 @@ class SpoofTimezone : Plugin() {
 
             val input = TextInput(view.context).apply {
                 editText.hint = "Enter Timezone ID (e.g. America/New_York)"
-
                 editText.setText(settings.getString("spoof_timezone_id", ""))
 
                 editText.addTextChangedListener(object : TextWatcher {
@@ -71,7 +62,8 @@ class SpoofTimezone : Plugin() {
                     override fun afterTextChanged(s: Editable?) {
                         val id = s.toString().trim()
                         settings.setString("spoof_timezone_id", id)
-                        Utils.showToast(view.context, "Set to: $id (Restart required)")
+
+                        applyTimezone(id, originalTimeZone)
                     }
                 })
             }
