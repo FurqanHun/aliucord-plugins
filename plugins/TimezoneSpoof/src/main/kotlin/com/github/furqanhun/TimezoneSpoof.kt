@@ -1,4 +1,4 @@
-package com.github.furqanhun.SpoofTimezone
+package com.github.furqanhun.TimezoneSpoof
 
 import android.content.Context
 import android.view.View
@@ -11,11 +11,11 @@ import com.aliucord.views.TextInput
 import java.util.TimeZone
 
 @AliucordPlugin(requiresRestart = true)
-class SpoofTimezone : Plugin() {
+class TimezoneSpoof : Plugin() {
 
     override fun start(context: Context) {
         settingsTab = SettingsTab(
-            SpoofTimezoneSettings::class.java,
+            TimezoneSpoofSettings::class.java,
             SettingsTab.Type.PAGE
         ).withArgs(settings)
 
@@ -39,24 +39,22 @@ class SpoofTimezone : Plugin() {
         }
     }
 
-    class SpoofTimezoneSettings(
+    class TimezoneSpoofSettings(
         private val settings: SettingsAPI
     ) : SettingsPage() {
 
         override fun onViewBound(view: View) {
             super.onViewBound(view)
 
-            setActionBarTitle("Spoof Timezone")
+            setActionBarTitle("Timezone Spoof")
 
-            val input = TextInput(view.context).apply {
-                editText.hint = "Enter Timezone ID (e.g. America/New_York)"
+            val input = TextInput(view.context, "Enter IANA Timezone (e.g. America/New_York)").apply {
                 editText.setText(settings.getString("spoof_timezone_id", ""))
             }
 
             val applyButton = com.aliucord.views.Button(view.context).apply {
                 text = "Apply Timezone"
                 setOnClickListener {
-                    // Safe native string conversion and trim
                     val id = input.editText.text.toString().trim()
                     settings.setString("spoof_timezone_id", id)
 
