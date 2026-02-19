@@ -15,17 +15,14 @@ import java.util.TimeZone
 @AliucordPlugin(requiresRestart = true)
 class SpoofTimezone : Plugin() {
 
-    // Store the real system timezone for fallback
-    private val originalTimeZone: TimeZone = TimeZone.getDefault()
-
     override fun start(context: Context) {
         settingsTab = SettingsTab(
             SpoofTimezoneSettings::class.java,
             SettingsTab.Type.PAGE
-        ).withArgs(settings, originalTimeZone)
+        ).withArgs(settings)
 
         // forcefully hijack the jvm process timezone on startup
-        applyTimezone(settings.getString("spoof_timezone_id", null), originalTimeZone)
+        applyTimezone(settings.getString("spoof_timezone_id", null))
     }
 
     override fun stop(context: Context) {
@@ -33,9 +30,11 @@ class SpoofTimezone : Plugin() {
     }
 
     companion object {
-        fun applyTimezone(spoofedId: String?, original: TimeZone) {
+        val originalTimeZone: TimeZone = TimeZone.getDefault()
+
+        fun applyTimezone(spoofedId: String?) {
             if (spoofedId.isNullOrBlank()) {
-                TimeZone.setDefault(original)
+                TimeZone.setDefault(originalTimeZone)
             } else {
                 TimeZone.setDefault(TimeZone.getTimeZone(spoofedId))
             }
@@ -43,8 +42,7 @@ class SpoofTimezone : Plugin() {
     }
 
     class SpoofTimezoneSettings(
-        private val settings: SettingsAPI,
-        private val originalTimeZone: TimeZone
+        private val settings: SettingsAPI
     ) : SettingsPage() {
 
         override fun onViewBound(view: View) {
@@ -63,7 +61,7 @@ class SpoofTimezone : Plugin() {
                         val id = s.toString().trim()
                         settings.setString("spoof_timezone_id", id)
 
-                        applyTimezone(id, originalTimeZone)
+                        applyTimezone(id)
                     }
                 })
             }
