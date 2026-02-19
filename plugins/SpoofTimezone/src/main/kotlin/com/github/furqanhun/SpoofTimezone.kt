@@ -1,8 +1,6 @@
 package com.github.furqanhun.SpoofTimezone
 
 import android.content.Context
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import com.aliucord.Utils
 import com.aliucord.annotations.AliucordPlugin
@@ -50,20 +48,22 @@ class SpoofTimezone : Plugin() {
 
             setActionBarTitle("Spoof Timezone")
 
+            // Just a dumb text box now. No live-updating crash garbage.
             val input = TextInput(view.context).apply {
                 editText.hint = "Enter Timezone ID (e.g. America/New_York)"
                 editText.setText(settings.getString("spoof_timezone_id", ""))
+            }
 
-                editText.addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-                    override fun afterTextChanged(s: Editable?) {
-                        val id = s.toString().trim()
-                        settings.setString("spoof_timezone_id", id)
+            // The magic button you asked for
+            val applyButton = com.aliucord.views.Button(view.context).apply {
+                text = "Apply Timezone"
+                setOnClickListener {
+                    val id = input.editText.text.toString().trim()
+                    settings.setString("spoof_timezone_id", id)
 
-                        applyTimezone(id)
-                    }
-                })
+                    applyTimezone(id) // Hijack it once on command
+                    Utils.showToast(view.context, "Applied! Force restart Discord if UI bugs out.")
+                }
             }
 
             val infoButton = com.aliucord.views.Button(view.context).apply {
@@ -79,11 +79,13 @@ class SpoofTimezone : Plugin() {
                 setOnClickListener {
                     settings.setString("spoof_timezone_id", "")
                     input.editText.setText("")
-                    Utils.showToast(view.context, "Reset! Restart Discord to apply.")
+                    applyTimezone("")
+                    Utils.showToast(view.context, "Reset to default! Restart Discord.")
                 }
             }
 
             addView(input)
+            addView(applyButton)
             addView(infoButton)
             addView(clearButton)
         }
