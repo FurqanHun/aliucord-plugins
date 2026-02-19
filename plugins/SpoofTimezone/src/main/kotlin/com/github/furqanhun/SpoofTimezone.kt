@@ -10,6 +10,7 @@ import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
 import com.aliucord.fragments.SettingsPage
 import com.aliucord.views.TextInput
+import com.aliucord.patcher.*
 import java.util.TimeZone
 
 @AliucordPlugin(requiresRestart = true)
@@ -49,7 +50,7 @@ class SpoofTimezone : Plugin() {
             setActionBarTitle("Spoof Timezone")
 
             val input = TextInput(view.context).apply {
-                hint = "Enter Timezone ID (e.g. America/New_York)"
+                editText.hint = "Enter Timezone ID (e.g. America/New_York)"
 
                 editText.setText(settings.getString("spoof_timezone_id", ""))
 
