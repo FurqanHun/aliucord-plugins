@@ -16,7 +16,7 @@ import java.util.TimeZone
 @AliucordPlugin(requiresRestart = true)
 class SpoofTimezone : Plugin() {
 
-    // Store the real system timezone for the fallback
+    // Store the real system timezone for fallback
     private val originalTimeZone: TimeZone = TimeZone.getDefault()
 
     override fun start(context: Context) {
@@ -25,16 +25,27 @@ class SpoofTimezone : Plugin() {
             SettingsTab.Type.PAGE
         ).withArgs(settings)
 
-        patcher.instead<TimeZone>(
-            "getDefault"
-        ) {
-            val spoofedId = settings.getString("spoof_timezone_id", null)
+        try {
+            patcher.patch(
+                TimeZone::class.java.getDeclaredMethod("getDefault"),
+                Hook { callFrame ->
+                    val spoofedId = settings.getString("spoof_timezone_id", null)
 
-            if (spoofedId.isNullOrBlank()) {
-                originalTimeZone
-            } else {
-                TimeZone.getTimeZone(spoofedId)
-            }
+                    callFrame.result = if (spoofedId.isNullOrBlank()) {
+                        originalTimeZone
+                    } else {
+                        val tz = TimeZone.getTimeZone(spoofedId)
+                        logger.info("Returning spoofed timezone: ${tz.id}")
+                        tz
+                    }
+                }
+            )
+
+            val currentSetting = settings.getString("spoof_timezone_id", "not set")
+            Utils.showToast("SpoofTimezone loaded! Current: $currentSetting")
+        } catch (e: Exception) {
+            logger.error("Failed to patch TimeZone.getDefault()", e)
+            Utils.showToast("Failed to patch timezone: ${e.message}")
         }
     }
 
@@ -60,6 +71,7 @@ class SpoofTimezone : Plugin() {
                     override fun afterTextChanged(s: Editable?) {
                         val id = s.toString().trim()
                         settings.setString("spoof_timezone_id", id)
+                        Utils.showToast(view.context, "Set to: $id (Restart required)")
                     }
                 })
             }
@@ -72,8 +84,18 @@ class SpoofTimezone : Plugin() {
                 }
             }
 
+            val clearButton = com.aliucord.views.Button(view.context).apply {
+                text = "Reset to System Default"
+                setOnClickListener {
+                    settings.setString("spoof_timezone_id", "")
+                    input.editText.setText("")
+                    Utils.showToast(view.context, "Reset! Restart Discord to apply.")
+                }
+            }
+
             addView(input)
             addView(infoButton)
+            addView(clearButton)
         }
     }
 }
