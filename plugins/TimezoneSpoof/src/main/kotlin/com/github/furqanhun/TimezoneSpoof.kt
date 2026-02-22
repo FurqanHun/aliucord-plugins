@@ -20,7 +20,7 @@ class TimezoneSpoof : Plugin() {
         ).withArgs(settings)
 
         // forcefully hijack the jvm process timezone on startup
-        applyTimezone(settings.getString("spoof_timezone_id", null))
+        applyTimezone(settings.getString("spoof_timezone_id", ""))
     }
 
     override fun stop(context: Context) {
@@ -30,8 +30,8 @@ class TimezoneSpoof : Plugin() {
     companion object {
         val originalTimeZone: TimeZone = TimeZone.getDefault()
 
-        fun applyTimezone(spoofedId: String?) {
-            if (spoofedId == null || spoofedId.length == 0) {
+        fun applyTimezone(spoofedId: String) {
+            if (spoofedId == "") {
                 TimeZone.setDefault(originalTimeZone)
             } else {
                 TimeZone.setDefault(TimeZone.getTimeZone(spoofedId))
