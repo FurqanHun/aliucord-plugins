@@ -59,7 +59,7 @@ class TimezoneSpoof : Plugin() {
                     settings.setString("spoof_timezone_id", id)
 
                     applyTimezone(id)
-                    Utils.showToast(view.context, "Applied! Force restart Discord to sync UI.")
+                    Utils.showToast(view.context, "Timezone spoofed! Please restart Discord.")
                 }
             }
 
@@ -67,7 +67,7 @@ class TimezoneSpoof : Plugin() {
                 text = "Check Current Detected Timezone"
                 setOnClickListener {
                     val current = TimeZone.getDefault()
-                    Utils.showToast(view.context, "Current: ${current.id} (${current.displayName})")
+                    Utils.showToast(view.context, "Currently detected (backend): ${current.id} (${current.displayName})")
                 }
             }
 
@@ -77,7 +77,7 @@ class TimezoneSpoof : Plugin() {
                     settings.setString("spoof_timezone_id", "")
                     input.editText.setText("")
                     applyTimezone("")
-                    Utils.showToast(view.context, "Reset to default! Restart Discord.")
+                    Utils.showToast(view.context, "Reset to system default! Please restart Discord.")
                 }
             }
 
