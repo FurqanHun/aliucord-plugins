@@ -8,7 +8,7 @@ A repository of custom plugins for [Aliucord](https://github.com/Aliucord)
 
 Allows you to override the system timezone exclusively within the Discord app.
 
-**Current Version:** 0.2.0
+**Current Version:** 0.3.0
 
 **Features:**
 - Specify any valid IANA Timezone ID (e.g., `America/New_York`, `Asia/Tokyo`, `Etc/UTC`).
