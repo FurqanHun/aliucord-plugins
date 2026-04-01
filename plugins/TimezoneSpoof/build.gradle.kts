@@ -1,9 +1,13 @@
-version = "0.3.0"
+version = "0.4.0"
 description = "Spoofs your timezone. Only in Discord."
 
 aliucord {
     changelog.set(
         """
+        # 0.4.0
+        * Added search dropdown for timezone selection
+        * Added IANA timezone validation
+
         # 0.3.0
         * Improved null safety and optimized string checks to prevent obfuscation crashes
         * Toned down UI toast messages for a cleaner, native-feeling experience
