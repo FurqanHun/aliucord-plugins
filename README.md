@@ -19,9 +19,9 @@ Allows you to override the system timezone exclusively within the Discord app.
 ## Installation
 
 ### Recommended Method (Official)
-TimezoneSpoof is officially accepted in the Aliucord repository! You can install it natively:
+TimezoneSpoof is officially accepted in the Aliucord repository! You can install it natively, You can sue the Plugin Web to install TimezoneSpoof or:
 1. Go to the **Aliucord Discord Server**.
-2. Navigate to the `#plugins` channel or use the Plugin Web.
+2. Navigate to the `#new-plugins` or `#plugin-list` channel.
 3. Search for **TimezoneSpoof** and install it directly into your app.
 4. Restart Discord, then head to **Settings > Plugins** to configure your spoofed timezone.
 
