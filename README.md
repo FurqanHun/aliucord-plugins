@@ -1,6 +1,9 @@
 # Aliucord Plugins
 
-A repository of custom plugins for [Aliucord](https://github.com/Aliucord)
+A repository of custom plugins for [Aliucord](https://github.com/Aliucord).
+
+> [!TIP]
+> Looking for AMOLED themes? Check out my [Aliucord Themes](https://github.com/FurqanHun/aliucord-themes) repository (featuring **AdoMoled** - A handcrafted pure AMOLED theme inspired by adomination, and **AmAmAmEx** - Pure AMOLED theme featuring **Material You (Monet)** dynamic wallpaper accents.)!
 
 ## Available Plugins
 
