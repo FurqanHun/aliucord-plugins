@@ -44,7 +44,7 @@ jobs:
           cd $GITHUB_WORKSPACE/src
           chmod +x ./gradlew
           ./gradlew make :generateUpdaterJson
-          
+
           rm -f $GITHUB_WORKSPACE/builds/*.zip
           cp $GITHUB_WORKSPACE/src/plugins/**/build/outputs/*.zip $GITHUB_WORKSPACE/builds/
           cp $GITHUB_WORKSPACE/src/build/outputs/updater.json $GITHUB_WORKSPACE/builds/
@@ -64,3 +64,12 @@ jobs:
           git add .
           git commit -m "Build $GITHUB_SHA" || exit 0   # do not error if nothing to commit
           git push
+
+      - name: Purge jsDelivr cache
+        run: |
+          cd $GITHUB_WORKSPACE/builds
+          curl -sS -o /dev/null "https://purge.jsdelivr.net/gh/${{ github.repository }}@builds/updater.json" || true
+          for file in $(git diff --name-only HEAD~1 -- "*.zip" 2>/dev/null || true); do
+            [ -n "$file" ] || continue
+            curl -sS -o /dev/null "https://purge.jsdelivr.net/gh/${{ github.repository }}@builds/$file" || true
+          done
